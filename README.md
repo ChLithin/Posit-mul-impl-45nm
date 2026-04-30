@@ -105,56 +105,6 @@ Full reports (area, power, timing) for all `(N, es)` configurations are in `synt
 
 > Note: The original paper (90nm, Synopsys DC) reports an average 16% power reduction. Our results on 45nm GPDK show higher reduction on larger formats — differences are expected due to the different PDK, tool, and synthesis flow.
 
----
-
-## Architecture Overview
-
-### Posit Format
-```
-[ s | regime (variable) | exponent (es bits) | fraction ]
-value = (−1)^s × useed^k × 2^exp × (1 + frac),   useed = 2^(2^es)
-```
-
-### Multiplier Datapath (from the paper, Fig. 4)
-1. **Posit extraction** — decode sign, regime (`k`, `shift_rg`), exponent, mantissa
-2. **Control generation** — derive `ctl_A`, `ctl_B` from `shift_rg`
-3. **Region-gated mantissa multiply** — only active PPG blocks compute
-4. **Sign & exponent processing** — XOR signs, add effective exponents
-5. **Carry-propagate adder + normalization**
-6. **Posit packing + rounding**
-
-### Region Gating — Control Truth Table (Table I from paper)
-
-| shift_rg | ctl | R_1 | R_2 | R_3 | R_4 |
-|----------|-----|:---:|:---:|:---:|:---:|
-| 0010     | 11  |  ✓  |  ✓  |  ✓  |  ✓  |
-| 0100     | 10  |     |  ✓  |  ✓  |  ✓  |
-| 1000     | 01  |     |     |  ✓  |  ✓  |
-| 1100     | 00  |     |     |     |  ✓  |
-
-### Scaling Across Posit Sizes
-
-| Posit Size | Module              | Cell Size | Grid     | Control |
-|------------|---------------------|-----------|----------|---------|
-| N = 8      | `mantissa_mult_2r`  | 4-bit     | 2×2 = 4  | 1-bit   |
-| N = 16     | `mantissa_mult_4r4` | 4-bit     | 4×4 = 16 | 2-bit   |
-| N = 32     | `mantissa_mult_4r8` | 8-bit     | 4×4 = 16 | 2-bit   |
-
-For N=32, 8-bit cells are used (instead of 4-bit) to keep the region count at 4×4 and avoid the area overhead of a larger control network — consistent with the paper's recommendation.
-
----
-
-## How to Simulate
-
-```bash
-# Example: N=16, es=1 with iverilog
-iverilog -o sim_16_1 tb/tb_posit_mul_16.v rtl/proposed/*.v
-vvp sim_16_1
-```
-
-For Cadence Xcelium or Synopsys VCS, compile with the `rtl/proposed/` source list and run the respective testbench.
-
----
 
 ## Reference
 
