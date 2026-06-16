@@ -15,7 +15,6 @@ vol. 67, no. 5, pp. 861–865, May 2020.
 DOI: [10.1109/TCSII.2020.2980531](https://doi.org/10.1109/TCSII.2020.2980531)
 
 The original paper synthesized on **STM 90nm** using Synopsys Design Compiler + PrimeTime PX. We re-implemented and synthesized on **45nm GPDK** using Cadence Genus.
-
 ---
 
 ## What We Did
