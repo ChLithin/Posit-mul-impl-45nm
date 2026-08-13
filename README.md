@@ -40,7 +40,6 @@ mantissa_mult_4r4 #(.MANT_W(MANT_W)) u_mm (
 );
 ```
 
----
 
 ## Background: The Paper's Key Idea
 
